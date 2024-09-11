@@ -1,0 +1,24 @@
+# Get all jobs
+GET http://localhost:3007/api/jobs
+
+# Insert jobs
+POST http://localhost:3007/api/employers
+Content-Type: application/json
+
+{
+    "company_name": "Tech Connect Inc.",
+    "website_link": "https://techinnovators.com",
+    "company_logo": "https://techinnovators.com/logo.png",
+    "job_title": "Software Engineer",
+    "industry": "Technology",
+    "job_description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia...",
+    "location_type": "country",
+    "location_value": "South Africa",
+    "work_type": "onsite", 
+    "salary_amount": "70000", 
+    "salary_type": "yearly", 
+    "employment_type": "full-time", 
+    "application_URL": "https://financesolutions.com/careers/financial-analyst"
+}
+
+
