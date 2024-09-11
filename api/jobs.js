@@ -2,7 +2,7 @@ export default function job_api(jobs_service_instance) {
   async function api(req, res) {
     try {
       res.json(
-        "Job Board API" 
+        "Wecome to Job Board API" 
       );
     } catch (err) {
       console.log("Error rendering api", err);
