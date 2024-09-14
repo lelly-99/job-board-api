@@ -1,59 +1,53 @@
-import pgPromise from "pg-promise";
-import cors from "cors";
-import 'dotenv/config'; // Loads environment variables from .env
-import express from "express";
-import job_api from "./api/jobs.js";
-import jobs_service from "./service/jobBoard.js";
-import employer_api from "./api/employers.js";
-import employers_service from "./service/employer.js";
+import pgPromise from 'pg-promise';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express from 'express';
+import jobsApi from './api/jobs.js';
+import jobBoardService from './service/jobBoard.js';
+import employersApi from './api/employers.js';
+import employerService from './service/employer.js';
 
-// Initialize pg-promise with options (optional: for query logging or other configurations)
+
+dotenv.config();
+
 const pgp = pgPromise();
-
-// SSL connection setup
-const useSSL = process.env.USE_SSL === 'true'; // Use an explicit USE_SSL flag from .env if available
-
-// Database connection options
+const useSSL = process.env.USE_SSL === 'true';
 const dbConfig = {
     connectionString: process.env.DATABASE_URL,
-    ssl: useSSL ? { rejectUnauthorized: false } : false, // Configure SSL based on useSSL flag
+    ssl: useSSL ? { rejectUnauthorized: false } : false,
 };
 
-// Initialize the database connection
 const database = pgp(dbConfig);
+const jobsService = jobBoardService(database);
+const employersService = employerService(database);
 
-// Services
-const jobs_service_instance = jobs_service(database);
-const employers_service_instance = employers_service(database);
+const jobsApiInstance = jobsApi(jobsService);
+const employersApiInstance = employersApi(employersService);
 
-// APIs
-const jobs_api = job_api(jobs_service_instance);
-const employers_api = employer_api(employers_service_instance);
-
-// Express instance
 const app = express();
+app.use(express.json());
+app.use(cors());
 
-// Middleware configurations
-app.use(express.json()); // Parses incoming JSON requests
-app.use(cors()); // Enables Cross-Origin Resource Sharing (CORS)
+app.get('/', (req, res) => jobsApiInstance.api(req, res));
+app.get('/api/jobs', (req, res) => jobsApiInstance.all_jobs(req, res));
+app.get('/api/jobs/name/:title', (req, res) => jobsApiInstance.jobs_by_title(req, res));
+app.get('/api/jobs/place/:location', (req, res) => jobsApiInstance.jobs_by_location(req, res));
+app.get('/api/jobs/work/:workType', (req, res) => jobsApiInstance.jobs_by_work_type(req, res));
+app.get('/api/jobs/employment/:employmentType', (req, res) => jobsApiInstance.jobs_by_employment_type(req, res));
 
-// API routes
-// Root route
-app.get('/', jobs_api.api);
+app.post('/api/employers', (req, res) => employersApiInstance.insert(req, res));
+app.put('/api/employers/update/:job_id', (req, res) => employersApiInstance.update(req, res));
+app.delete('/api/employers/delete/:job_id', (req, res) => employersApiInstance.deleteJob(req, res));
 
-// Job routes
-app.get('/api/jobs', jobs_api.all_jobs);
-app.get('/api/jobs/name/:title', jobs_api.jobs_by_title);
-app.get('/api/jobs/place/:location', jobs_api.jobs_by_location);
-app.get('/api/jobs/work/:workType', jobs_api.jobs_by_work_type);
-app.get('/api/jobs/employment/:employmentType', jobs_api.jobs_by_employment_type);
+app.use((err, req, res, next) => {
+    console.error('Unexpected error:', err);
+    res.status(500).json({
+        status: 'error',
+        message: 'An unexpected error occurred',
+        error: err.message,
+    });
+});
 
-// Employer routes
-app.post('/api/employers', employers_api.insert);
-app.put('/api/employers/job/:job_id', employers_api.update);
-app.delete('/api/employers/job/:job_id', employers_api.deleteJob);
-
-// Start the server
 const PORT = process.env.PORT || 3007;
 app.listen(PORT, () => {
     console.log(`App started at port: ${PORT}`);

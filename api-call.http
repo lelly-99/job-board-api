@@ -1,8 +1,8 @@
-# Get all jobs
-GET http://localhost:3007/api/jobs
+# Get all
+
 
 # Insert jobs
-POST http://localhost:3007/api/employers
+POST http://localhost:3007/api/delete/2
 Content-Type: application/json
 
 {
