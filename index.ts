@@ -1,7 +1,7 @@
 import pgPromise, { IMain, IDatabase } from 'pg-promise';
+import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import express, { Application, Request, Response, NextFunction } from 'express';
 import job_api from './api/jobs';
 import jobs_service from './service/jobBoard';
 import employer_api from './api/employers';
@@ -71,5 +71,7 @@ const PORT = process.env.PORT || 3007;
 app.listen(PORT, () => {
     console.log(`App started at port: ${PORT}`);
 });
+
+
 
 
