@@ -1,6 +1,6 @@
 # Get all
 
-GET http://localhost:3007/api/jobs/place/usa
+GET http://localhost:3007/api/jobs/
 # Insert jobs
 # POST http://localhost:3007/api/delete/2
 Content-Type: application/json
